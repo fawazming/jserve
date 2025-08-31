@@ -52,6 +52,8 @@ class SlugJson extends ResourceController
         if (!$saved) {
             return $this->failServerError('Failed to save JSON data');
         }
+        header("Access-Control-Allow-Origin: *");
+
 
         return $this->respondCreated(['message' => 'JSON data updated for slug: ' . $slug]);
     }
