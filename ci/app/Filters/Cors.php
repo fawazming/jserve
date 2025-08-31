@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Filters;
+<?php namespace App\Filters;
 
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -10,18 +8,24 @@ class Cors implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-
-        // Handle preflight (OPTIONS) requests
-        // if ($request->getMethod() === 'options') {
-        //     header("HTTP/1.1 200 OK");
-        //     exit; // stop execution for preflight
-        // }
+        // For OPTIONS requests, respond immediately with 200 and CORS headers
+        if ($request->getMethod() === 'options')
+        {
+            $response = service('response');
+            $response->setHeader('Access-Control-Allow-Origin', '*')
+                     ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+                     ->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+                     ->setStatusCode(200)
+                     ->send();
+            exit; // Stop further execution
+        }
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        return $response;
+        // Add CORS headers to all responses
+        $response->setHeader('Access-Control-Allow-Origin', '*')
+                 ->setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+                 ->setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     }
 }
